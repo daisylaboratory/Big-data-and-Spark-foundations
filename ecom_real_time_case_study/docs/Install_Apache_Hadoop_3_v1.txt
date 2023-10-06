@@ -1,0 +1,259 @@
+Install Apache Hadoop:
+======================
+
+Step 1: Install Java 8(OpenJDK)
+
+
+pwd
+
+
+sudo apt update
+
+
+sudo apt install openjdk-8-jdk
+
+
+ls /usr/lib/jvm/java-8-openjdk-amd64
+
+
+nano ~/.bashrc
+
+export JAVA_HOME=/usr/lib/jvm/java-8-openjdk-amd64
+export PATH=$PATH:$JAVA_HOME/bin
+
+source ~/.bashrc
+
+
+To verify the java version you can use the following command:
+
+java -version
+
+
+
+Step 2: Create the SSH Key for password-less login (Press enter button when it asks you to enter a filename to save the key)
+
+sudo apt-get install openssh-server openssh-client
+
+ssh-keygen -t rsa -P ""
+
+Copy the generated ssh key to authorized keys
+
+cat $HOME/.ssh/id_rsa.pub >> $HOME/.ssh/authorized_keys
+
+ssh localhost
+
+exit
+
+
+Step 3: Download the Hadoop 3.2.1 Package/Binary file
+
+
+mkdir -p workarea/softwares
+
+cd workarea/softwares
+
+
+pwd
+
+
+https://hadoop.apache.org/releases.html
+
+Choose hadoop version(3.2.4)
+
+wget https://dlcdn.apache.org/hadoop/common/hadoop-3.2.4/hadoop-3.2.4.tar.gz
+
+Move the file: hadoop-3.2.4.tar.gz into /home/datamaking/workarea/softwares directory
+
+mv hadoop-3.2.4.tar.gz /home/datamaking/workarea/softwares
+
+pwd
+
+
+tar -xzvf hadoop-3.2.4.tar.gz
+
+ls
+
+
+Step 4: Add the HADOOP_HOME and JAVA_HOME paths in the bash file (.bashrc)
+
+
+nano ~/.bashrc
+
+
+# HADOOP VARIABLES SETTINGS START HERE
+
+export HADOOP_HOME=/home/datamaking/workarea/softwares/hadoop-3.2.4
+export PATH=$PATH:$HADOOP_HOME/bin
+export PATH=$PATH:$HADOOP_HOME/sbin
+export HADOOP_MAPRED_HOME=$HADOOP_HOME
+export HADOOP_COMMON_HOME=$HADOOP_HOME
+export HADOOP_HDFS_HOME=$HADOOP_HOME
+export YARN_HOME=$HADOOP_HOME
+export HADOOP_COMMON_LIB_NATIVE_DIR=$HADOOP_HOME/lib/native
+export HADOOP_COMMON_LIB_NATIVE_DIR=$HADOOP_HOME/lib/native
+export HADOOP_OPTS="-Djava.library.path=$HADOOP_HOME/lib"
+export HADOOP_OPTS="-Djava.library.path=$HADOOP_COMMON_LIB_NATIVE_DIR"
+
+# HADOOP VARIABLES SETTINGS END HERE
+
+
+source ~/.bashrc
+
+
+hadoop version
+
+
+Step 5: Create or Modifiy Hadoop configuration files
+
+Now create/edit the configuration files in /home/datamaking/workarea/softwares/hadoop-3.2.4/etc/hadoop directory.
+
+Edit hadoop-env.sh as follows,
+
+nano /home/datamaking/workarea/softwares/hadoop-3.2.4/etc/hadoop/hadoop-env.sh
+
+export JAVA_HOME=/usr/lib/jvm/java-8-openjdk-amd64
+
+
+
+mkdir -p /home/datamaking/workarea/softwares/hadoop_data/tmp
+
+Edit core-site.xml as follows,
+
+nano core-site.xml
+
+	<property>
+		<name>hadoop.tmp.dir</name>
+		<value>/home/datamaking/workarea/softwares/hadoop_data/tmp</value>
+		<description>Parent directory for other temporary directories.</description>
+	</property>
+	<property>
+		<name>fs.defaultFS</name>
+		<value>hdfs://localhost:9000</value>
+		<description>The name of the default file system. </description>
+	</property>
+
+
+mkdir -p /home/datamaking/workarea/softwares/hadoop_data/namenode
+
+mkdir -p /home/datamaking/workarea/softwares/hadoop_data/datanode
+
+sudo chown -R datamaking:datamaking /home/datamaking/workarea/softwares
+
+
+Edit hdfs-site.xml as follows,
+
+nano hdfs-site.xml
+
+	<property>
+		<name>dfs.namenode.name.dir</name>
+		<value>/home/datamaking/workarea/softwares/hadoop_data/namenode</value>
+	</property>
+	<property>
+		<name>dfs.datanode.data.dir</name>
+		<value>/home/datamaking/workarea/softwares/hadoop_data/datanode</value>
+	</property>
+	<property>
+		<name>dfs.replication</name>
+		<value>1</value>
+	</property>
+	
+
+Edit mapred-site.xml as follows,
+
+nano mapred-site.xml
+
+	<property>
+		<name>mapreduce.framework.name</name>
+		<value>yarn</value>
+	</property>
+
+Edit yarn-site.xml as follows,
+
+nano yarn-site.xml
+
+	<property>
+		<name>yarn.nodemanager.aux-services</name>
+		<value>mapreduce_shuffle</value>
+	</property>
+	<property>
+		<name>yarn.nodemanager.aux-services.mapreduce.shuffle.class</name>
+		<value>org.apache.hadoop.mapred.ShuffleHandler</value>
+	</property>
+	<property>
+		<name>yarn.nodemanager.aux-services.mapreduce.shuffle.class</name>
+		<value>org.apache.hadoop.mapred.ShuffleHandler</value>
+	</property>
+	<property>
+		<name>yarn.resourcemanager.webapp.address</name>
+		<value>localhost:8088</value>
+	</property>
+
+
+Setting ownership for /home/datamaking/workarea/softwares
+
+sudo chown -R datamaking:datamaking /home/datamaking/workarea/softwares
+
+
+Step 6: Format the namenode
+
+hdfs namenode -format
+
+FYI.
+
+2022-07-22 20:08:39,580 INFO namenode.FSImage: Allocated new BlockPoolId: BP-1010846379-127.0.1.1-1658500719567
+2022-07-22 20:08:39,633 INFO common.Storage: Storage directory /home/datamaking/workarea/softwares/hadoop_data/namenode has been successfully formatted.
+2022-07-22 20:08:39,748 INFO namenode.FSImageFormatProtobuf: Saving image file /home/datamaking/workarea/softwares/hadoop_data/namenode/current/fsimage.ckpt_0000000000000000000 using no compression
+2022-07-22 20:08:39,950 INFO namenode.FSImageFormatProtobuf: Image file /home/datamaking/workarea/softwares/hadoop_data/namenode/current/fsimage.ckpt_0000000000000000000 of size 405 bytes saved in 0 seconds .
+2022-07-22 20:08:39,957 INFO namenode.NNStorageRetentionManager: Going to retain 1 images with txid >= 0
+2022-07-22 20:08:40,042 INFO namenode.FSNamesystem: Stopping services started for active state
+2022-07-22 20:08:40,042 INFO namenode.FSNamesystem: Stopping services started for standby state
+2022-07-22 20:08:40,053 INFO namenode.FSImage: FSImageSaver clean checkpoint: txid=0 when meet shutdown.
+2022-07-22 20:08:40,054 INFO namenode.NameNode: SHUTDOWN_MSG: 
+/************************************************************
+SHUTDOWN_MSG: Shutting down NameNode at datamakingvm3/127.0.1.1
+************************************************************/
+
+
+
+Start the NameNode daemon and DataNode daemon by using the scripts in the /sbin directory, provided by Hadoop.
+
+start-dfs.sh
+
+
+Start ResourceManager daemon and NodeManager daemon.
+
+
+start-yarn.sh
+
+
+Run jps command to check running hadoop JVM processes
+
+jps
+
+FYI.
+
+datamaking@datamakingvm3:~/workarea/softwares/hadoop-3.2.4/etc/hadoop$ jps
+22289 Jps
+21969 NodeManager
+21609 SecondaryNameNode
+21418 DataNode
+21819 ResourceManager
+21277 NameNode
+datamaking@datamakingvm3:~/workarea/softwares/hadoop-3.2.4/etc/hadoop$
+
+
+Open your web browser and go to the below URL to browse the NameNode.
+
+http://localhost:9870
+
+
+Open your web browser and go to the below URL to access the ResourceManager.
+
+
+http://localhost:8088
+
+mr-jobhistory-daemon.sh start historyserver
+
+http://localhost:19888/jobhistory
+
+

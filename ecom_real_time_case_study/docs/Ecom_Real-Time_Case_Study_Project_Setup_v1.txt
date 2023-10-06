@@ -1,0 +1,113 @@
+Ecom Real-Time Case Study Project Setup:
+========================================
+
+Prerequisite
+
+Ubuntu 20.04 Linux OS with login sudo user name as datamaking (or equivalent user name, change the respective user name in the installation steps if your user name is different)
+Follow these documents to make project environment ready
+1. Install_Python_v1.txt
+2. Install_MySQL_v1.txt
+3. Install_Apache_Hadoop_3_v1.txt
+4. Install_Apache_Spark_3_v1.txt
+5. Install_Apache_Kafka_v1.txt
+
+OR 
+
+You can download our pre-built virtual machine(VM) which above technologies pre-installed
+Google Drive Link: https://drive.google.com/drive/folders/1s9sRbnbeGLQW5DwZDkV0spY4Am4FheET?usp=sharing
+Username: datamaking
+Password: datamaking
+
+
+Activate Python Virtual Environment:
+------------------------------------
+
+pwd
+
+ls /home/datamaking/datamaking/
+
+
+source /home/datamaking/datamaking/bin/activate
+
+
+Install dependency Python packages:
+-----------------------------------
+
+cd /home/datamaking/workarea/code/course_download/ecom-real-time-case-study/realtime_charts
+
+
+sudo apt-get install libmysqlclient-dev libssl-dev python3-dev
+
+
+pip install -r requirements.txt
+
+
+-------------------------- For your reference starts here -------------------------------------
+
+For now, ignore if you see the following error message pattern while installing python package mysqlclient,
+
+  usage: setup.py [global_opts] cmd1 [cmd1_opts] [cmd2 [cmd2_opts] ...]
+     or: setup.py --help [cmd1 cmd2 ...]
+     or: setup.py --help-commands
+     or: setup.py cmd --help
+  
+  error: invalid command 'bdist_wheel'
+  ----------------------------------------
+  ERROR: Failed building wheel for mysqlclient
+  Running setup.py clean for mysqlclient
+Failed to build mysqlclient
+
+-------------------------- For your reference ends here -------------------------------------
+
+
+
+Create MySQL database name: ecom_db
+-----------------------------------
+
+MySQL Username: root
+MySQL Password: datamaking
+
+mysql -u root -p
+
+
+create database ecom_db;
+
+show databases;
+
+exit;
+
+
+Run Real-Time Dashboard Application:
+------------------------------------
+
+cd /home/datamaking/workarea/code/course_download/ecom-real-time-case-study/realtime_charts
+
+
+python manage.py runserver
+
+
+Access Real-Time Dashboard Application using below url,
+
+http://127.0.0.1:8000/
+
+
+Run Kafka Producer Application(Stream data simulator):
+------------------------------------------------------
+
+cd /home/datamaking/workarea/code/course_download/ecom-real-time-case-study/kafka_producer_consumer
+
+pip install -r requirements.txt
+
+python kafka_producer.py
+
+
+Run Data Processing Pipeline application(Spark Streaming):
+----------------------------------------------------------
+
+cd /home/datamaking/workarea/code/course_download/ecom-real-time-case-study/realtime_data_processing
+
+spark-submit --master local[*] --packages org.apache.spark:spark-sql-kafka-0-10_2.12:3.3.0,mysql:mysql-connector-java:5.1.49 --files /home/datamaking/workarea/code/course_download/ecom-real-time-case-study/realtime_data_processing/datamaking_app.conf /home/datamaking/workarea/code/course_download/ecom-real-time-case-study/realtime_data_processing/realtime_data_processing.py
+
+Keep monitoring the real-time dashboard using below url,
+
+http://127.0.0.1:8000/

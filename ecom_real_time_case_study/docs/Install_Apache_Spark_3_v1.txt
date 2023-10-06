@@ -1,0 +1,105 @@
+Install Apache Spark:
+=====================
+
+Prerequisite:
+
+Python assumed to be insatlled on Ubuntu
+Java assumed to be insatlled on Ubuntu
+
+
+Install Scala and sbt
+
+
+https://www.scala-lang.org/download/2.12.16.html
+
+scala-2.12.16.tgz
+
+
+wget https://downloads.lightbend.com/scala/2.12.16/scala-2.12.16.tgz
+
+ls
+
+mv scala-2.12.16.tgz /home/datamaking/workarea/softwares/
+
+
+cd /home/datamaking/workarea/softwares/
+
+tar -xvzf scala-2.12.16.tgz
+
+
+ls
+
+nano ~/.bashrc 
+
+export SCALA_HOME=/home/datamaking/workarea/softwares/scala-2.12.16
+export PATH=$PATH:$SCALA_HOME/bin
+
+source ~/.bashrc
+
+cd /home/datamaking
+
+https://www.scala-sbt.org/download.html
+
+
+wget https://github.com/sbt/sbt/releases/download/v1.7.1/sbt-1.7.1.tgz
+
+ls
+
+sbt-1.7.1.tgz
+
+
+mv sbt-1.7.1.tgz /home/datamaking/workarea/softwares/
+
+cd /home/datamaking/workarea/softwares/
+
+tar -xvzf sbt-1.7.1.tgz
+
+ls
+
+nano ~/.bashrc
+
+
+export SBT_HOME=/home/datamaking/workarea/softwares/sbt
+export PATH=$PATH:$SBT_HOME/bin
+
+source ~/.bashrc
+
+
+cd /home/datamaking
+
+
+Download the latest version of the Apache Spark from its official website.
+
+https://spark.apache.org/downloads.html
+
+https://dlcdn.apache.org/spark/spark-3.3.0/spark-3.3.0-bin-hadoop3.tgz
+
+wget https://dlcdn.apache.org/spark/spark-3.3.0/spark-3.3.0-bin-hadoop3.tgz
+
+ls
+
+mv spark-3.3.0-bin-hadoop3.tgz /home/datamaking/workarea/softwares/
+
+cd /home/datamaking/workarea/softwares/
+ 
+tar -xvzf spark-3.3.0-bin-hadoop3.tgz
+
+
+Add the SPARK_HOME path in the bash file (.bashrc)
+
+
+nano ~/.bashrc
+
+export SPARK_HOME=/home/datamaking/workarea/softwares/spark-3.3.0-bin-hadoop3
+export PATH=$PATH:$SPARK_HOME/bin:$SPARK_HOME/sbin
+
+
+source ~/.bashrc
+
+spark-submit --version
+
+pyspark --version
+
+spark-shell --version
+
+

@@ -1,0 +1,169 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+          content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <!-- CSS only -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.0-beta1/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-0evHe/X+R7YkIZDRvuzKMRqM+OrBnVFBL6DOitfPri4tjfHxaWutUpFmBp4vmVor" crossorigin="anonymous">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.8.0/chart.min.js">
+    </script>
+    <script src="https://code.jquery.com/jquery-3.5.1.min.js" crossorigin="anonymous"></script>
+    <title>Real-Time Charts Application</title>
+
+    <style>
+        /* Header/Logo Title */
+
+        .header {
+            padding: 20px;
+            text-align: center;
+            background: #1abc9c;
+            color: white;
+            font-size: 20px;
+        }
+
+        /* Current Refresh Time */
+        .refresh_time {
+            text-align: center;
+            color: #EA4335;
+            font-weight: bold;
+            font-size: 20px;
+            font-family: Verdana;
+            margin-top: 20px;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>Real-Time Sales Dashboard</h1>
+    </div>
+    <div class="refresh_time" id="current_refresh_time">
+        Current Refresh Time:
+    </div>
+    <div class="container">
+        <div class="row">
+            <div class="col-12 mx-auto mt-4">
+                <canvas id="myBarChart" width="400" height="200"></canvas>
+            </div>
+        </div>
+    </div>
+
+    <div class="container">
+        <div class="row">
+            <div class="col-12 mx-auto mt-3">
+                <h5>Sales Reports</h5>
+                <br />
+                  <form id="filterForm">
+                    <label for="salesby">Choose a Sales By:</label>
+                    <select class="form-select" name="salesby" id="salesby"></select> <br/>
+                    <input type="submit" class="btn btn-primary" value="Load" name="_load">
+                  </form>
+                <br />
+
+                <canvas id="myPieChart"></canvas>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let salesByCtx = document.getElementById("myPieChart").getContext("2d");
+        let salesByChart = new Chart(salesByCtx, {
+          type: "pie",
+          options: {
+            responsive: true,
+            layout: {
+              padding: {
+                left: 0,
+                right: 0,
+                top: 0,
+                bottom: 25
+              }
+            },
+            plugins: {
+                title: {
+                    display: true,
+                    text: 'Sales by Card Type',
+                    font: {
+                    size: 25
+                  }
+                }
+            }
+          }
+        });
+    </script>
+    <script>
+      $(document).ready(function() {
+        $.ajax({
+          url: "/chart/filter-options/",
+          type: "GET",
+          dataType: "json",
+          success: (jsonResponse) => {
+            // Load all the options
+            jsonResponse.options.forEach(option => {
+              $("#salesby").append(new Option(option, option));
+            });
+            // Load data for the first option
+            loadAllCharts($("#salesby").children().first().val());
+          },
+          error: () => console.log("Failed to fetch chart filter options!")
+        });
+      });
+
+    $("#filterForm").on("submit", (event) => {
+      event.preventDefault();
+
+      const salesby = $("#salesby").val();
+      console.log(salesby);
+      loadAllCharts(salesby);
+    });
+
+    function loadChart(chart, endpoint) {
+      console.log(chart);
+      $.ajax({
+        url: endpoint,
+        type: "GET",
+        dataType: "json",
+        success: (jsonResponse) => {
+          // Extract data from the response
+          const title = jsonResponse.title;
+          const labels = jsonResponse.data.labels;
+          const datasets = jsonResponse.data.datasets;
+
+          chart.canvas.parentNode.style.height = '50%';
+          chart.canvas.parentNode.style.width = '50%';
+
+          // Reset the current chart
+          chart.data.datasets = [];
+          chart.data.labels = [];
+
+          // Load new data into the chart
+          chart.options.plugins.title.text = title;
+          chart.options.plugins.title.display = true;
+          chart.data.labels = labels;
+          datasets.forEach(dataset => {
+            chart.data.datasets.push(dataset);
+          });
+          chart.update();
+        },
+        error: () => console.log("Failed to fetch chart data from " + endpoint + "!")
+      });
+    }
+
+    function loadAllCharts(salesby) {
+      console.log(salesby);
+      console.log(salesByChart);
+      loadChart(salesByChart, `/chart/sales-by/${salesby}/`);
+    }
+    </script>
+
+    <script src="{% static 'main.js' %}"></script>
+
+    <footer class="footer fixed-bottom container">
+        <hr>
+        <p style="text-align: center;">&copy; 2022 <a href="https://www.youtube.com/c/datamaking" target="_blank">DataMaking</a></p>
+    </footer>
+
+</body>
+</html>

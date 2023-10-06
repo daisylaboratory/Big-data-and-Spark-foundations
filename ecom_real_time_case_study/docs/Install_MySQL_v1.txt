@@ -1,0 +1,51 @@
+Install MySQL:
+==============
+
+sudo apt update
+
+
+sudo apt install mysql-server
+
+
+sudo systemctl status mysql
+
+
+mysql --version
+
+
+MySQL CLI,
+
+sudo mysql
+
+
+if MySQL client is not there, run the below command:
+
+sudo apt install mysql-client
+
+
+
+Securing MySQL(setting password for root user)
+
+
+SELECT user,authentication_string,plugin,host FROM mysql.user;
+
+ALTER USER 'root'@'localhost' IDENTIFIED WITH mysql_native_password by 'datamaking';
+
+FLUSH PRIVILEGES;
+
+
+SELECT user,authentication_string,plugin,host FROM mysql.user;
+
+
+exit;
+
+
+sudo systemctl status mysql
+
+
+sudo mysql -u root -p
+
+show databases;
+
+exit;
+
